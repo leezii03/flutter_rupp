@@ -15,7 +15,7 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(textTheme: GoogleFonts.spaceGroteskTextTheme()),
       debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.splash,
+      initialRoute: AppRoutes.login,
       onGenerateRoute: PageRoutes.onGenerateRoute,
     );
   }

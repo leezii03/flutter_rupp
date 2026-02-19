@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_assignment/constant/appcolors.dart';
+import 'package:flutter_assignment/routes/app_routes.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,26 +40,32 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildLogout() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.red.shade50,
-        borderRadius: BorderRadius.circular(50),
-      ),
-      child: Column(
-        children: [
-          _buildSettings(
-            leading: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: Colors.red,
-                shape: BoxShape.circle,
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamedAndRemoveUntil(
+            context, AppRoutes.login, (route) => false);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.red.shade50,
+          borderRadius: BorderRadius.circular(50),
+        ),
+        child: Column(
+          children: [
+            _buildSettings(
+              leading: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  shape: BoxShape.circle,
+                ),
               ),
+              title: "Logout",
+              icon: Icon(Icons.arrow_forward_ios, size: 18),
             ),
-            title: "Logout",
-            icon: Icon(Icons.arrow_forward_ios, size: 18),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

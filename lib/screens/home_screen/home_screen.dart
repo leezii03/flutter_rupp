@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_assignment/constant/appcolors.dart';
 import 'package:flutter_assignment/constant/appimage.dart';
+import 'package:flutter_assignment/data/category.dart';
+import 'package:flutter_assignment/data/posts.dart';
 import 'package:flutter_assignment/widgets/customcard.dart';
 import 'package:flutter_assignment/widgets/custompopup.dart';
 import 'package:flutter_assignment/widgets/customtextfield.dart';
@@ -13,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  int selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,28 +66,52 @@ class _HomeScreenState extends State<HomeScreen> {
         physics: NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         itemBuilder: (context, index) {
-          return Customcard();
+          return Customcard(
+            post: posts[index],
+          );
         },
         separatorBuilder: (context, index) => SizedBox(height: 10),
-        itemCount: 5);
+        itemCount: posts.length);
   }
 
   Widget _buildCategory() {
     return ListView.separated(
       padding: EdgeInsets.symmetric(horizontal: 15),
+      itemCount: categories.length,
       scrollDirection: Axis.horizontal,
-      itemCount: 5,
+      separatorBuilder: (context, index) => SizedBox(width: 10),
       itemBuilder: (context, index) {
-        return Container(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          decoration: BoxDecoration(
-            color: Appcolors.primary,
-            borderRadius: BorderRadius.circular(5),
+        final bool isActive = selectedIndex == index;
+        return GestureDetector(
+          onTap: () {
+            setState(() {
+              selectedIndex = index;
+            });
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            decoration: BoxDecoration(
+              color: isActive ? Appcolors.primary : Colors.transparent,
+              borderRadius: BorderRadius.circular(5),
+              border: isActive
+                  ? null
+                  : Border.all(
+                      color: Appcolors.primary,
+                      width: 1,
+                    ),
+            ),
+            child: Center(
+              child: Text(
+                categories[index],
+                style: TextStyle(
+                  color: isActive ? Colors.white : Appcolors.primary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
           ),
-          child: Center(child: Text("Temples")),
         );
       },
-      separatorBuilder: (context, index) => SizedBox(width: 10),
     );
   }
 

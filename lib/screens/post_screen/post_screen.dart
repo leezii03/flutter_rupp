@@ -33,6 +33,8 @@ class _PostScreenState extends State<PostScreen> {
             const SizedBox(height: 20),
             _buildLocation(),
             const SizedBox(height: 20),
+            _buildDirection(),
+            const SizedBox(height: 20),
             _buildCategory(),
             const SizedBox(height: 20),
             _buildButtonPost(),
@@ -117,6 +119,34 @@ class _PostScreenState extends State<PostScreen> {
     );
   }
 
+  Widget _buildDirection() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text("Direction",
+              style: TextStyle(fontWeight: FontWeight.w600)),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: TextField(
+              decoration: const InputDecoration(
+                icon: Icon(Icons.location_on_outlined),
+                hintText: "Enter Direction...",
+                border: InputBorder.none,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildLocation() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -134,7 +164,7 @@ class _PostScreenState extends State<PostScreen> {
             child: TextField(
               decoration: const InputDecoration(
                 icon: Icon(Icons.location_on_outlined),
-                hintText: "Search location...",
+                hintText: "Enter location...",
                 border: InputBorder.none,
               ),
             ),

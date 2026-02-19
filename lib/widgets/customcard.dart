@@ -3,7 +3,8 @@ import 'package:flutter_assignment/constant/appcolors.dart';
 import 'package:flutter_assignment/constant/appimage.dart';
 
 class Customcard extends StatelessWidget {
-  const Customcard({super.key});
+  final Map<String, dynamic> post;
+  const Customcard({super.key, required this.post});
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +23,8 @@ class Customcard extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
-              child: Image.asset(
-                Appimages.angkorwat,
+              child: Image.network(
+                post['image'],
                 height: 150,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -44,28 +45,19 @@ class Customcard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: 10),
-                Text("Siemreap, Cambodia"),
+                Text(post['location']),
               ],
             ),
-            Text("Siemreap's most iconic temples destination"),
-            SizedBox(
-              height: 40,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (context, index) {
-                  return Container(
-                    padding: EdgeInsets.symmetric(horizontal: 15),
-                    decoration: BoxDecoration(
-                      color: Appcolors.primary.withValues(alpha: .30),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Center(
-                      child: Text("History"),
-                    ),
-                  );
-                },
-                separatorBuilder: (context, index) => SizedBox(width: 10),
-                itemCount: 3,
+            Text(post['caption']),
+            Container(
+              height: 35,
+              width: 120,
+              decoration: BoxDecoration(
+                color: Appcolors.primary.withValues(alpha: .30),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Center(
+                child: Text(post['category']),
               ),
             ),
             Row(
@@ -95,7 +87,7 @@ class Customcard extends StatelessWidget {
                     shape: BoxShape.circle,
                     border: Border.all(
                       width: 1,
-                      color: Appcolors.background,
+                      color: Appcolors.primary,
                     ),
                   ),
                   child: Icon(

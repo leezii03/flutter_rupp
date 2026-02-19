@@ -31,6 +31,8 @@ class _MainscreenState extends State<Mainscreen> {
           highlightColor: Colors.transparent,
         ),
         child: BottomNavigationBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
           type: BottomNavigationBarType.fixed,
           selectedItemColor: Appcolors.primary,
           selectedFontSize: 14,
@@ -61,7 +63,7 @@ class _MainscreenState extends State<Mainscreen> {
                       color: Appcolors.primary,
                     )
                   : Image.asset(Appimages.favorite, width: 24),
-              label: "Home",
+              label: "Favorite",
             ),
             BottomNavigationBarItem(
               icon: index == 2
@@ -71,7 +73,7 @@ class _MainscreenState extends State<Mainscreen> {
                       color: Appcolors.primary,
                     )
                   : Image.asset(Appimages.add, width: 24),
-              label: "Home",
+              label: "Post",
             ),
             BottomNavigationBarItem(
               icon: index == 3
@@ -81,7 +83,7 @@ class _MainscreenState extends State<Mainscreen> {
                       color: Appcolors.primary,
                     )
                   : Image.asset(Appimages.profile, width: 24),
-              label: "Home",
+              label: "Profile",
             ),
           ],
         ),
