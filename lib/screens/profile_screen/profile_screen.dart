@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_assignment/constant/appcolors.dart';
+import 'package:flutter_assignment/models/user_info.dart';
 import 'package:flutter_assignment/routes/app_routes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -10,9 +14,64 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  String? username, email;
+  // final user = SessionManager.currentUser;
+  var user = UserInfo();
+
+  void testuser() async {
+    var prefs = await SharedPreferences.getInstance();
+    var data = prefs.getString("currentUser");
+
+    debugPrint("data $data");
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    // print(user?.email);
+    super.initState();
+    _loadUser();
+  }
+
+  Future<void> _loadUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userString =
+        prefs.getString('currentUser') ?? "";
+
+    debugPrint("current from pref: $userString");
+
+    var map = jsonDecode(userString);
+
+    debugPrint("UserName : ${map["username"]}");
+
+    final mapUser = UserInfo.fromJson(map);
+
+    setState(() {
+      user = mapUser;
+    });
+
+
+    // setState(() {
+    //   user.email = map["email"];
+    //   user.userId = map["userId"];
+    //   user.username = map["username"];
+    //   user.password = map["password"];
+    // });
+
+    // if (userString != null) {
+    //   final userMap = jsonDecode(userString);
+    //   setState(() {
+    //     final user = UserInfo.fromJson(userMap); // now user is loaded safely
+    //     SessionManager.currentUser = user; // keep in memory too
+    //   });
+    //   print(user?.email); // safe now
+    // }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -21,7 +80,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 children: [
                   _buildProfile(),
-                  _buildDestination(),
                   SizedBox(height: 15),
                   _buildAppearance(),
                   SizedBox(height: 15),
@@ -41,7 +99,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildLogout() {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.clear();
         Navigator.pushNamedAndRemoveUntil(
             context, AppRoutes.login, (route) => false);
       },
@@ -230,35 +290,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildDestination() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Destination",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-        ),
-        SizedBox(height: 5),
-        Container(
-          decoration: BoxDecoration(
-            color: Appcolors.primary.withValues(alpha: .20),
-            borderRadius: BorderRadius.circular(50),
-          ),
-          child: _buildSettings(
-            leading: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                  color: Appcolors.background, shape: BoxShape.circle),
-            ),
-            title: "My Favorite Destination",
-            icon: Icon(Icons.arrow_forward_ios, size: 18),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildSettings({
     required Widget leading,
     required String title,
@@ -306,13 +337,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         SizedBox(height: 10),
         Text(
-          "Theav LyLy",
+          user.username,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 24,
           ),
         ),
-        Text("lylyisabatukam@gmail.com"),
+        Text(user.email),
         SizedBox(height: 10),
         ElevatedButton(
           style: ElevatedButton.styleFrom(

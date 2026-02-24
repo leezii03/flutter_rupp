@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_assignment/constant/appcolors.dart';
 import 'package:flutter_assignment/constant/appimage.dart';
-import 'package:flutter_assignment/services/auth_service.dart';
+import 'package:flutter_assignment/services/api_config.dart';
 import 'package:flutter_assignment/widgets/customshimmer.dart';
 import 'package:flutter_assignment/widgets/customtextfield.dart';
 import 'package:http/http.dart' as http;

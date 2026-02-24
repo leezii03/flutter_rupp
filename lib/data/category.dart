@@ -1,5 +1,5 @@
-var categories = [
-  "all",
+List<String> categories = [
+  "All",
   "Temple",
   "Beach",
   "Market",

@@ -1,11 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_assignment/constant/appcolors.dart';
 import 'package:flutter_assignment/constant/appimage.dart';
+import 'package:flutter_assignment/models/SessionManager.dart';
+import 'package:flutter_assignment/models/user_info.dart';
 import 'package:flutter_assignment/routes/app_routes.dart';
-import 'package:flutter_assignment/services/auth_service.dart';
+import 'package:flutter_assignment/services/api_config.dart';
 import 'package:flutter_assignment/widgets/customshimmer.dart';
 import 'package:flutter_assignment/widgets/customtextfield.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -28,16 +33,10 @@ class _LoginScreenState extends State<LoginScreen> {
       isLoading = true;
       apiError = null;
     });
-
     final url = Uri.parse('${ApiConfig.baseUrl}/api/v1/Profile/login');
-
     try {
       final response = await http.post(
         url,
-        // headers: {
-        //   "Content-Type": "application/json",
-        //   "Accept": "application/json",
-        // },
         body: {
           "email": emailCtr.text.trim(),
           "password": passwordCtr.text.trim(),
@@ -48,8 +47,27 @@ class _LoginScreenState extends State<LoginScreen> {
 
       final message = response.body.trim();
 
-      if (response.statusCode == 200 && message == "login") {
-        Navigator.pushNamedAndRemoveUntil(
+      if (response.statusCode == 200 && message.isNotEmpty) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool("isLogin", true);
+        debugPrint(message);
+        final data = jsonDecode(message);
+        final userinfo = UserInfo();
+        userinfo.userId = data["userId"];
+        userinfo.username = data["username"];
+        userinfo.email = data["email"];
+        userinfo.password = data["password"];
+        SessionManager.currentUser = userinfo;
+
+        var userData = {
+          "userId": data["userId"],
+          "username": data["username"],
+          "email": data["email"],
+          "password": data["password"],
+        };
+        prefs.setString("currentUser", jsonEncode(userData));
+
+        await Navigator.pushNamedAndRemoveUntil(
             context, AppRoutes.main, (route) => false);
       } else {
         setState(() {
@@ -224,64 +242,42 @@ class _LoginScreenState extends State<LoginScreen> {
             Text("Forgot Password?"),
           ],
         ),
-        Row(
-          spacing: 10,
-          children: [
-            Expanded(
-              child: SizedBox(
-                height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Appcolors.primary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  onPressed: isLoading
-                      ? null
-                      : () {
-                          setState(() {
-                            apiError = null;
-                          });
+        SizedBox(
+          height: 50,
+          width: double.infinity,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Appcolors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: isLoading
+                ? null
+                : () {
+                    setState(() {
+                      apiError = null;
+                    });
 
-                          if (_formKey.currentState!.validate()) {
-                            login();
-                          }
-                        },
-                  child: isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : const Text(
-                          "Login",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 50,
-              child: OutlinedButton(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    if (_formKey.currentState!.validate()) {
+                      login();
+                    }
+                  },
+            child: isLoading
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : const Text(
+                    "Login",
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                ),
-                onPressed: () {},
-                child: Text(
-                  "As Guest",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ],
     );

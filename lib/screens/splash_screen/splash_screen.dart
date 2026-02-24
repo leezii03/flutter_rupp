@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_assignment/constant/appcolors.dart';
 import 'package:flutter_assignment/constant/appimage.dart';
 import 'package:flutter_assignment/routes/app_routes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,16 +14,23 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  Future<void> checkLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    bool isLogin = prefs.getBool("isLogin") ?? false;
+
+    await Future.delayed(Duration(seconds: 1));
+    if (isLogin) {
+      Navigator.pushNamedAndRemoveUntil(
+          context, AppRoutes.main, (route) => false);
+    } else {
+      Navigator.pushReplacementNamed(context, AppRoutes.onboard);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-
-    Future.delayed(
-      const Duration(seconds: 2),
-      () {
-        Navigator.pushReplacementNamed(context, AppRoutes.onboard);
-      },
-    );
+    checkLogin();
   }
 
   @override

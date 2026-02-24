@@ -1,10 +1,71 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_assignment/constant/appcolors.dart';
 import 'package:flutter_assignment/constant/appimage.dart';
+import 'package:flutter_assignment/routes/app_routes.dart';
+import 'package:flutter_assignment/services/api_config.dart';
+import 'package:http/http.dart' as http;
 
-class Customcard extends StatelessWidget {
+class Customcard extends StatefulWidget {
   final Map<String, dynamic> post;
-  const Customcard({super.key, required this.post});
+  final int userId;
+  const Customcard({super.key, required this.post, required this.userId});
+
+  @override
+  State<Customcard> createState() => _CustomcardState();
+}
+
+class _CustomcardState extends State<Customcard> {
+  bool isFav = false;
+
+  Future<void> checkIfFav() async {
+    final url =
+        Uri.parse('${ApiConfig.baseUrl}/api/Favorite/user/${widget.userId}');
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        List<dynamic> favIds = jsonDecode(response.body);
+        setState(() {
+          isFav = favIds.contains(widget.post['id']);
+        });
+      }
+    } catch (e) {
+      debugPrint("Error fetching favorites: $e");
+    }
+  }
+
+  Future<void> toggleFavorite() async {
+    try {
+      if (!isFav) {
+        final url = Uri.parse('${ApiConfig.baseUrl}/api/v1/Favorite/save');
+        final response = await http.post(
+          url,
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode({
+            "userId": widget.userId,
+            "uploadId": widget.post['id'],
+          }),
+        );
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          setState(() {
+            isFav = true;
+          });
+        }
+      }
+    } catch (e) {
+      print("Error toggling favorite: $e");
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    checkIfFav();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +85,7 @@ class Customcard extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: Image.network(
-                post['image'],
+                widget.post['image'][0],
                 height: 150,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -45,20 +106,13 @@ class Customcard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: 10),
-                Text(post['location']),
+                Text(widget.post['location']),
               ],
             ),
-            Text(post['caption']),
-            Container(
-              height: 35,
-              width: 120,
-              decoration: BoxDecoration(
-                color: Appcolors.primary.withValues(alpha: .30),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Center(
-                child: Text(post['category']),
-              ),
+            Text(
+              widget.post['caption'],
+              maxLines: 2,
+              style: TextStyle(overflow: TextOverflow.ellipsis),
             ),
             Row(
               children: [
@@ -71,7 +125,13 @@ class Customcard extends StatelessWidget {
                         side: BorderSide(width: 1, color: Appcolors.primary),
                         splashFactory: NoSplash.splashFactory,
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushNamed(
+                          context,
+                          AppRoutes.details,
+                          arguments: widget.post,
+                        );
+                      },
                       child: Text(
                         "View Details",
                         style: TextStyle(fontWeight: FontWeight.bold),
@@ -80,19 +140,22 @@ class Customcard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: 10),
-                Container(
-                  height: 50,
-                  width: 50,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      width: 1,
+                GestureDetector(
+                  onTap: toggleFavorite,
+                  child: Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        width: 1,
+                        color: Appcolors.primary,
+                      ),
+                    ),
+                    child: Icon(
+                      isFav ? Icons.favorite : Icons.favorite_outline,
                       color: Appcolors.primary,
                     ),
-                  ),
-                  child: Icon(
-                    Icons.favorite_outline,
-                    color: Appcolors.primary,
                   ),
                 ),
               ],

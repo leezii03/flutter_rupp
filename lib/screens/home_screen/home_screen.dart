@@ -1,11 +1,17 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_assignment/constant/appcolors.dart';
-import 'package:flutter_assignment/constant/appimage.dart';
 import 'package:flutter_assignment/data/category.dart';
-import 'package:flutter_assignment/data/posts.dart';
+import 'package:flutter_assignment/models/SessionManager.dart';
+import 'package:flutter_assignment/models/user_info.dart';
+import 'package:flutter_assignment/services/post_service.dart';
+import 'package:flutter_assignment/widgets/customappbar.dart';
 import 'package:flutter_assignment/widgets/customcard.dart';
-import 'package:flutter_assignment/widgets/custompopup.dart';
-import 'package:flutter_assignment/widgets/customtextfield.dart';
+import 'package:flutter_assignment/widgets/customshimmer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,63 +21,168 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  int? currentUserId;
   int selectedIndex = 0;
+  List<dynamic> posts = [];
+  List<dynamic> filteredPosts = [];
+  bool isLoading = true;
+
+  Future<void> fetchPosts() async {
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      final data = await PostService.getAllPosts();
+      data.sort((a, b) => b['id'].compareTo(a['id']));
+      setState(() {
+        posts = data;
+        filteredPosts = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      print(e);
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  // final user = SessionManager.currentUser;
+  Future<void> _loadUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userString = prefs.getString('currentUser');
+
+    if (userString != null) {
+      final userMap = jsonDecode(userString);
+      final user = UserInfo.fromJson(userMap);
+      SessionManager.currentUser = user;
+      setState(() {
+        currentUserId = user.userId;
+      });
+    }
+  }
+
+  Future<void> _initialize() async {
+    await _loadUser();
+    await fetchPosts();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _initialize();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        scrolledUnderElevation: 0,
-        title: Text("Explore"),
-        centerTitle: false,
-        actions: [
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.transparent,
-              shadowColor: Colors.transparent,
-              splashFactory: NoSplash.splashFactory,
-            ),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => Custompopup(
-                  title: "Coming Soon!!!",
-                  message:
-                      "We're still working on this feature.\nStay tuned it will be available soon!",
-                  confirmText: "Okay",
+      appBar: Customappbar(),
+      body: Platform.isIOS
+          ? CustomScrollView(
+              slivers: [
+                CupertinoSliverRefreshControl(
+                  onRefresh: fetchPosts,
                 ),
-              );
-            },
-            child: Image.asset(Appimages.notification),
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
+                SliverList(
+                  delegate: SliverChildListDelegate(
+                    [
+                      _buildSearchEngine(),
+                      SizedBox(height: 15),
+                      SizedBox(height: 50, child: _buildCategory()),
+                      _buildListPost(),
+                    ],
+                  ),
+                )
+              ],
+            )
+          : RefreshIndicator(
+              onRefresh: fetchPosts,
+              child: SingleChildScrollView(
+                physics: AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildSearchEngine(),
+                    SizedBox(height: 15),
+                    SizedBox(height: 50, child: _buildCategory()),
+                    _buildListPost(),
+                  ],
+                ),
+              ),
+            ),
+    );
+  }
+
+  Widget _buildShimmerPost() {
+    return ListView.separated(
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: 2,
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      itemBuilder: (context, index) {
+        return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSearchEngine(),
-            SizedBox(height: 15),
-            SizedBox(height: 50, child: _buildCategory()),
-            _buildListPost(),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Customshimmer(
+                width: double.infinity,
+                height: 220,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Customshimmer(
+              width: MediaQuery.of(context).size.width * 0.7,
+              height: 16,
+            ),
+            const SizedBox(height: 8),
+            Customshimmer(
+              width: MediaQuery.of(context).size.width * 0.5,
+              height: 14,
+            ),
+            const SizedBox(height: 8),
+            Customshimmer(
+              width: MediaQuery.of(context).size.width * 0.3,
+              height: 12,
+            ),
           ],
-        ),
-      ),
+        );
+      },
+      separatorBuilder: (_, __) => const SizedBox(height: 20),
     );
   }
 
   Widget _buildListPost() {
+    if (isLoading) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 15),
+        child: _buildShimmerPost(),
+      );
+    }
+
+    if (filteredPosts.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Text("No posts available"),
+        ),
+      );
+    }
+
     return ListView.separated(
-        physics: NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemBuilder: (context, index) {
-          return Customcard(
-            post: posts[index],
-          );
-        },
-        separatorBuilder: (context, index) => SizedBox(height: 10),
-        itemCount: posts.length);
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      itemBuilder: (context, index) {
+        return Customcard(
+          post: filteredPosts[index],
+          userId: currentUserId ?? 0,
+        );
+      },
+      separatorBuilder: (context, index) => const SizedBox(height: 10),
+      itemCount: filteredPosts.length,
+    );
   }
 
   Widget _buildCategory() {
@@ -86,6 +197,14 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: () {
             setState(() {
               selectedIndex = index;
+              final selectedCategory = categories[index];
+              if (selectedCategory == "All") {
+                filteredPosts = posts;
+              } else {
+                filteredPosts = posts
+                    .where((post) => post['category'] == selectedCategory)
+                    .toList();
+              }
             });
           },
           child: Container(
@@ -127,35 +246,6 @@ class _HomeScreenState extends State<HomeScreen> {
               fontWeight: FontWeight.bold,
               fontSize: 20,
             ),
-          ),
-          SizedBox(height: 15),
-          Row(
-            children: [
-              Expanded(
-                child: SizedBox(
-                  height: 45,
-                  child: Customtextfield(
-                    prefix: Icon(Icons.location_on_outlined, size: 24),
-                    hintText: "Search your destination",
-                  ),
-                ),
-              ),
-              SizedBox(width: 10),
-              Container(
-                height: 45,
-                width: 45,
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  border: Border.all(width: 1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Image.asset(
-                  Appimages.sort,
-                  width: 30,
-                  height: 30,
-                ),
-              ),
-            ],
           ),
         ],
       ),
