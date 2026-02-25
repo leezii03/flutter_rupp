@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.4
   geolocator: ^14.0.2
   google_fonts: ^8.0.0
   google_maps_flutter: ^2.14.2
@@ -18,6 +19,14 @@ dependencies:
   shimmer: ^3.0.0
   smooth_page_indicator: ^2.0.1
   url_launcher: ^6.3.2
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logo2.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/logo2.png"
 
 dev_dependencies:
   flutter_test:
