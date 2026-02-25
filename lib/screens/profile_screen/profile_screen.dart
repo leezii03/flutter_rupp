@@ -1,7 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_assignment/constant/appcolors.dart';
+import 'package:flutter_assignment/models/SessionManager.dart';
 import 'package:flutter_assignment/models/user_info.dart';
 import 'package:flutter_assignment/routes/app_routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,7 +14,6 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   String? username, email;
-  // final user = SessionManager.currentUser;
   var user = UserInfo();
 
   void testuser() async {
@@ -28,44 +26,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     // TODO: implement initState
-    // print(user?.email);
     super.initState();
     _loadUser();
   }
 
   Future<void> _loadUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userString =
-        prefs.getString('currentUser') ?? "";
-
-    debugPrint("current from pref: $userString");
-
-    var map = jsonDecode(userString);
-
-    debugPrint("UserName : ${map["username"]}");
-
-    final mapUser = UserInfo.fromJson(map);
-
-    setState(() {
-      user = mapUser;
-    });
-
-
-    // setState(() {
-    //   user.email = map["email"];
-    //   user.userId = map["userId"];
-    //   user.username = map["username"];
-    //   user.password = map["password"];
-    // });
-
-    // if (userString != null) {
-    //   final userMap = jsonDecode(userString);
-    //   setState(() {
-    //     final user = UserInfo.fromJson(userMap); // now user is loaded safely
-    //     SessionManager.currentUser = user; // keep in memory too
-    //   });
-    //   print(user?.email); // safe now
-    // }
+    user = SessionManager.currentUser!;
   }
 
   @override
@@ -84,8 +50,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   _buildAppearance(),
                   SizedBox(height: 15),
                   _buildSetting(),
-                  SizedBox(height: 15),
-                  _buildSupport(),
                   SizedBox(height: 15),
                   _buildLogout(),
                 ],
@@ -120,6 +84,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   color: Colors.red,
                   shape: BoxShape.circle,
                 ),
+                child: Icon(
+                  Icons.logout,
+                  color: Colors.white,
+                ),
               ),
               title: "Logout",
               icon: Icon(Icons.arrow_forward_ios, size: 18),
@@ -127,53 +95,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildSupport() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Support",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-        ),
-        SizedBox(height: 5),
-        Container(
-          decoration: BoxDecoration(
-            color: Appcolors.primary.withValues(alpha: .20),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Column(
-            children: [
-              _buildSettings(
-                leading: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                      color: Appcolors.background, shape: BoxShape.circle),
-                ),
-                title: "Report on issue",
-                icon: Icon(Icons.arrow_forward_ios, size: 18),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: Divider(color: Appcolors.background),
-              ),
-              _buildSettings(
-                leading: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                      color: Appcolors.background, shape: BoxShape.circle),
-                ),
-                title: "FAQ",
-                icon: Icon(Icons.arrow_forward_ios, size: 18),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 
@@ -188,7 +109,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         SizedBox(height: 5),
         Container(
           decoration: BoxDecoration(
-            color: Appcolors.primary.withValues(alpha: .20),
+            color: Appcolors.primary.withValues(alpha: .15),
             borderRadius: BorderRadius.circular(15),
           ),
           child: Column(
@@ -198,7 +119,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                      color: Appcolors.background, shape: BoxShape.circle),
+                    color: Appcolors.background,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.person,
+                    color: Colors.white,
+                  ),
                 ),
                 title: "Account",
                 icon: Icon(Icons.arrow_forward_ios, size: 18),
@@ -212,7 +139,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                      color: Appcolors.background, shape: BoxShape.circle),
+                    color: Appcolors.background,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.notifications,
+                    color: Colors.white,
+                  ),
                 ),
                 title: "Notification",
                 icon: Transform.scale(
@@ -238,7 +171,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                      color: Appcolors.background, shape: BoxShape.circle),
+                    color: Appcolors.background,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.language,
+                    color: Colors.white,
+                  ),
                 ),
                 title: "Language",
                 icon: Icon(Icons.arrow_forward_ios, size: 18),
@@ -261,7 +200,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         SizedBox(height: 5),
         Container(
           decoration: BoxDecoration(
-            color: Appcolors.primary.withValues(alpha: .20),
+            color: Appcolors.primary.withValues(alpha: .15),
             borderRadius: BorderRadius.circular(50),
           ),
           child: _buildSettings(
@@ -269,7 +208,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                  color: Appcolors.background, shape: BoxShape.circle),
+                color: Appcolors.background,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.dark_mode,
+                color: Colors.white,
+              ),
             ),
             title: "Dark Mode",
             icon: Transform.scale(
@@ -333,6 +278,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
           decoration: BoxDecoration(
             color: Appcolors.background,
             shape: BoxShape.circle,
+          ),
+          child: Center(
+            child: Text(
+              user.username[0].toUpperCase(),
+              style: TextStyle(
+                fontSize: 48,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
           ),
         ),
         SizedBox(height: 10),

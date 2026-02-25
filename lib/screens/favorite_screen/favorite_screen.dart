@@ -8,7 +8,6 @@ import 'package:flutter_assignment/services/post_service.dart';
 import 'package:flutter_assignment/widgets/customappbar.dart';
 import 'package:flutter_assignment/widgets/customcard.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 class FavoriteScreen extends StatefulWidget {
   const FavoriteScreen({super.key});
@@ -21,21 +20,11 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   List<dynamic> favoritePosts = [];
   bool isLoading = true;
   int? currentUserId;
+  var user = UserInfo();
 
   Future<void> _loadUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userString = prefs.getString('currentUser');
-
-    if (userString != null) {
-      final userMap = jsonDecode(userString);
-      final user = UserInfo.fromJson(userMap);
-
-      SessionManager.currentUser = user;
-
-      setState(() {
-        currentUserId = user.userId;
-      });
-    }
+    user = SessionManager.currentUser!;
+    currentUserId = user.userId;
   }
 
   Future<void> fetchFavoritePosts() async {

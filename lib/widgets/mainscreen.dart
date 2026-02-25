@@ -37,6 +37,9 @@ class _MainscreenState extends State<Mainscreen> {
         child: BottomNavigationBar(
           backgroundColor: Colors.white,
           type: BottomNavigationBarType.fixed,
+          selectedFontSize: 12,
+          unselectedFontSize: 12,
+          iconSize: 24,
           currentIndex: index,
           selectedItemColor: Appcolors.primary,
           onTap: (value) {

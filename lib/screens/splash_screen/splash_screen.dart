@@ -1,8 +1,12 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_assignment/constant/appcolors.dart';
 import 'package:flutter_assignment/constant/appimage.dart';
+import 'package:flutter_assignment/models/SessionManager.dart';
+import 'package:flutter_assignment/models/user_info.dart';
 import 'package:flutter_assignment/routes/app_routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,8 +22,12 @@ class _SplashScreenState extends State<SplashScreen> {
     final prefs = await SharedPreferences.getInstance();
     bool isLogin = prefs.getBool("isLogin") ?? false;
 
-    await Future.delayed(Duration(seconds: 1));
+    await Future.delayed(const Duration(seconds: 1));
     if (isLogin) {
+      String? userJson = prefs.getString("currentUser");
+      if (userJson != null) {
+        SessionManager.currentUser = UserInfo.fromJson(jsonDecode(userJson));
+      }
       Navigator.pushNamedAndRemoveUntil(
           context, AppRoutes.main, (route) => false);
     } else {

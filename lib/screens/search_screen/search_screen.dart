@@ -6,7 +6,6 @@ import 'package:flutter_assignment/models/user_info.dart';
 import 'package:flutter_assignment/services/api_config.dart';
 import 'package:flutter_assignment/widgets/customcard.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -19,6 +18,7 @@ class _SearchScreenState extends State<SearchScreen> {
   int? currentUserId;
   List<dynamic> posts = [];
   bool isLoading = false;
+  var user = UserInfo();
   TextEditingController searchCtr = TextEditingController();
 
   Future<void> searchPosts(String location) async {
@@ -38,10 +38,10 @@ class _SearchScreenState extends State<SearchScreen> {
           posts = data;
         });
       } else {
-        print("Error: ${response.statusCode}");
+        debugPrint("Error: ${response.statusCode}");
       }
     } catch (e) {
-      print("Error fetching posts: $e");
+      debugPrint("Error fetching posts: $e");
     } finally {
       setState(() {
         isLoading = false;
@@ -50,17 +50,8 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Future<void> _loadUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userString = prefs.getString('currentUser');
-
-    if (userString != null) {
-      final userMap = jsonDecode(userString);
-      final user = UserInfo.fromJson(userMap);
-      SessionManager.currentUser = user;
-      setState(() {
-        currentUserId = user.userId;
-      });
-    }
+    user = SessionManager.currentUser!;
+    currentUserId = user.userId;
   }
 
   Future<void> _initialize() async {

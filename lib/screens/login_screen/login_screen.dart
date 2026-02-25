@@ -7,7 +7,6 @@ import 'package:flutter_assignment/models/SessionManager.dart';
 import 'package:flutter_assignment/models/user_info.dart';
 import 'package:flutter_assignment/routes/app_routes.dart';
 import 'package:flutter_assignment/services/api_config.dart';
-import 'package:flutter_assignment/widgets/customshimmer.dart';
 import 'package:flutter_assignment/widgets/customtextfield.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -307,19 +306,24 @@ class _LoginScreenState extends State<LoginScreen> {
     return Row(
       spacing: 10,
       children: [
-        Customshimmer(width: 50, height: 50),
+        Container(
+          height: 50,
+          width: 50,
+          decoration: BoxDecoration(),
+          child: Image.asset(Appimages.logo2),
+        ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Explore",
+              "RukRok",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
                 height: 1,
               ),
             ),
-            Text("by Theav LyLy"),
+            Text("by Team 007"),
           ],
         ),
       ],

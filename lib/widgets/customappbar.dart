@@ -13,7 +13,7 @@ class Customappbar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: Colors.white,
       scrolledUnderElevation: 0,
-      title: const Text("Explore"),
+      title: const Text("RukRok"),
       centerTitle: false,
       actions: [
         IconButton(

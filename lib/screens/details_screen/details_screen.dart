@@ -61,43 +61,22 @@ class _DetailsScreenState extends State<DetailsScreen> {
   Widget _buildFooter() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Row(
-        spacing: 10,
-        children: [
-          Expanded(
-            child: SizedBox(
-              height: 50,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Appcolors.primary,
-                  foregroundColor: Colors.white,
-                ),
-                onPressed: () {
-                  final String mapUrl = widget.post["direction"];
-                  openMapFromApi(mapUrl);
-                },
-                child: Text(
-                  "Get Direction",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
+      child: SizedBox(
+        height: 50,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Appcolors.primary,
+            foregroundColor: Colors.white,
           ),
-          SizedBox(
-            height: 50,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Appcolors.primary,
-                foregroundColor: Colors.white,
-              ),
-              onPressed: () {},
-              child: Text(
-                "Add to favorite",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
+          onPressed: () {
+            final String mapUrl = widget.post["direction"];
+            openMapFromApi(mapUrl);
+          },
+          child: Text(
+            "Get Direction",
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
-        ],
+        ),
       ),
     );
   }

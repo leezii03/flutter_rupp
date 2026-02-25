@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -11,7 +10,6 @@ import 'package:flutter_assignment/services/post_service.dart';
 import 'package:flutter_assignment/widgets/customappbar.dart';
 import 'package:flutter_assignment/widgets/customcard.dart';
 import 'package:flutter_assignment/widgets/customshimmer.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,6 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List<dynamic> posts = [];
   List<dynamic> filteredPosts = [];
   bool isLoading = true;
+
+  var user = UserInfo();
 
   Future<void> fetchPosts() async {
     setState(() {
@@ -47,19 +47,9 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // final user = SessionManager.currentUser;
   Future<void> _loadUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userString = prefs.getString('currentUser');
-
-    if (userString != null) {
-      final userMap = jsonDecode(userString);
-      final user = UserInfo.fromJson(userMap);
-      SessionManager.currentUser = user;
-      setState(() {
-        currentUserId = user.userId;
-      });
-    }
+    user = SessionManager.currentUser!;
+    currentUserId = user.userId;
   }
 
   Future<void> _initialize() async {

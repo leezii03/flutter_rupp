@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_assignment/constant/appcolors.dart';
-import 'package:flutter_assignment/constant/appimage.dart';
 import 'package:flutter_assignment/routes/app_routes.dart';
 import 'package:flutter_assignment/services/api_config.dart';
 import 'package:http/http.dart' as http;
@@ -21,7 +20,7 @@ class _CustomcardState extends State<Customcard> {
 
   Future<void> checkIfFav() async {
     final url =
-        Uri.parse('${ApiConfig.baseUrl}/api/Favorite/user/${widget.userId}');
+        Uri.parse('${ApiConfig.baseUrl}/api/v1/Favorite/user/${widget.userId}');
 
     try {
       final response = await http.get(url);
@@ -100,8 +99,8 @@ class _CustomcardState extends State<Customcard> {
                     shape: BoxShape.circle,
                     color: Appcolors.primary.withValues(alpha: .30),
                   ),
-                  child: Image.asset(
-                    Appimages.location,
+                  child: Icon(
+                    Icons.location_on,
                     color: Appcolors.primary,
                   ),
                 ),
