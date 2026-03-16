@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_assignment/constant/appcolors.dart';
@@ -10,6 +11,7 @@ import 'package:flutter_assignment/services/post_service.dart';
 import 'package:flutter_assignment/widgets/customappbar.dart';
 import 'package:flutter_assignment/widgets/customcard.dart';
 import 'package:flutter_assignment/widgets/customshimmer.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,6 +23,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int? currentUserId;
   int selectedIndex = 0;
+  int sliderIndex = 0;
   List<dynamic> posts = [];
   List<dynamic> filteredPosts = [];
   bool isLoading = true;
@@ -80,7 +83,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     [
                       _buildSearchEngine(),
                       SizedBox(height: 15),
+                      _buildSlider(),
+                      SizedBox(height: 15),
                       SizedBox(height: 50, child: _buildCategory()),
+                      SizedBox(height: 15),
                       _buildListPost(),
                     ],
                   ),
@@ -96,7 +102,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     _buildSearchEngine(),
                     SizedBox(height: 15),
+                    _buildSlider(),
+                    SizedBox(height: 15),
                     SizedBox(height: 50, child: _buildCategory()),
+                    SizedBox(height: 15),
                     _buildListPost(),
                   ],
                 ),
@@ -221,6 +230,52 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildSlider() {
+    var images = [
+      "https://afar.brightspotcdn.com/dims4/default/943e99c/2147483647/strip/true/crop/3000x1592+0+295/resize/1440x764!/quality/90/?url=https%3A%2F%2Fk3-prod-afar-media.s3.us-west-2.amazonaws.com%2Fbrightspot%2F34%2F8c%2F0a3f548947909b5b8d79b935b03f%2Ftravelguides-siemreap-guitarphotographer-shutterstock.jpg",
+      "https://api.asiavivatravel.com/wp-content/uploads/2024/12/Pristine-Saracen-Bay_-Turquoise-waters-and-serene-white-sands-of-Koh-Rong-Samloem.png",
+      "https://cdn-az.allevents.in/events1/banners/1c40f9fcae94a501f8ef73ec7ea67da554a2ec761d59d2773ff018b87cfb6b2b-rimg-w1024-h595-dcaac1d6-gmir?v=1735362533",
+    ];
+    return Column(
+      children: [
+        CarouselSlider(
+          items: images.map((image) {
+            return Builder(builder: (context) {
+              return Container(
+                width: double.infinity,
+                margin: EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  image: DecorationImage(
+                      image: NetworkImage(image), fit: BoxFit.cover),
+                ),
+              );
+            });
+          }).toList(),
+          options: CarouselOptions(
+            enableInfiniteScroll: false,
+            viewportFraction: 1,
+            height: 200,
+            autoPlay: true,
+            autoPlayInterval: Duration(seconds: 4),
+            onPageChanged: (index, reason) {
+              setState(() {
+                sliderIndex = index;
+              });
+            },
+          ),
+        ),
+        SizedBox(height: 10),
+        AnimatedSmoothIndicator(
+          activeIndex: sliderIndex,
+          count: 3,
+          effect: WormEffect(
+              dotWidth: 30, dotHeight: 5, activeDotColor: Appcolors.primary),
+        )
+      ],
     );
   }
 

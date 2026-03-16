@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_assignment/constant/appimage.dart';
 import 'package:flutter_assignment/routes/app_routes.dart';
 import 'package:flutter_assignment/widgets/custompopup.dart';
 
@@ -13,7 +14,14 @@ class Customappbar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: Colors.white,
       scrolledUnderElevation: 0,
-      title: const Text("RukRok"),
+      title: Transform.rotate(
+        angle: 0.1,
+        child: Image.asset(
+          Appimages.logo3,
+          width: 90,
+          fit: BoxFit.cover,
+        ),
+      ),
       centerTitle: false,
       actions: [
         IconButton(
